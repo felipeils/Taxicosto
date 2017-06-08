@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=B8:6D:B7:A4:BA:E0:E4:5C:6A:64:81:25:5E:76:55:44:CB:F5:DA:AC%3Bcom.example.pipe.taxicostoapp
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    B8:6D:B7:A4:BA:E0:E4:5C:6A:64:81:25:5E:76:55:44:CB:F5:DA:AC
+
+    SHA-1 certificate fingerprint:
+    B8:6D:B7:A4:BA:E0:E4:5C:6A:64:81:25:5E:76:55:44:CB:F5:DA:AC
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCa4fTgtmwgn4RzkqM1YnLkIPsdtpLDGPw</string>
+</resources>
