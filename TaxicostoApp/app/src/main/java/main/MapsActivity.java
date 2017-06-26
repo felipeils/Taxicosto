@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -27,6 +31,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +53,8 @@ import modulos.Route;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback , DirectionFinderListener {
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback , DirectionFinderListener, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
     private Button btnFindPath;
@@ -49,18 +65,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ProgressDialog progressDialog;
 
+
+    public static final int SIGN_IN_CODE = 777;
+
+    private boolean flagBoolean ;
+    private GoogleApiClient googleApiClient;
+
+    private LoginActivity loginActivity = new LoginActivity();
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        //GOOGLE SIGNIN
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        ////
+
+
+
+
+        //TODO: revisar metodo para logeo con google y facebook
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         if (AccessToken.getCurrentAccessToken() == null) {
-            goLoginScreen();
-        }
+           goLoginScreen();
+       }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        FloatingActionButton btnSalir = (FloatingActionButton) findViewById(R.id.btnSalir);
+        btnSalir.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                deslogear();
+            }
+        });
+
 
         btnFindPath = (Button) findViewById(R.id.btnFindPath);
         etOrigin = (EditText) findViewById(R.id.etOrigin);
@@ -74,6 +126,76 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(googleApiClient);
+        if (opr.isDone()) {
+            GoogleSignInResult result = opr.get();
+            handleSignInResult(result);
+        } else {
+            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
+                    handleSignInResult(googleSignInResult);
+                }
+            });
+        }
+    }
+
+    public boolean handleSignInResult(GoogleSignInResult result) {
+        if(result.isSuccess())
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //si esta resultado de estado de login google
+        if (requestCode == SIGN_IN_CODE) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+
+    }
+
+    public void logOut() {
+        Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(@NonNull Status status) {
+                if (status.isSuccess()) {
+                    goLogInScreen();
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.not_close_session, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    private void goLogInScreen() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void deslogear() {
+        //Toast.makeText(this, "Flag :)", Toast.LENGTH_SHORT).show();
+        logOut();
+        loginActivity.disconnectFromFacebook();
+        goLoginScreen();
+    }
+
+
     private void goLoginScreen() {
 
         Intent intent = new Intent(this, LoginActivity.class);
@@ -81,7 +203,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(intent);
     }
 
-    public void logout(View view) {
+    public void logout() {
         LoginManager.getInstance().logOut();
         goLoginScreen();
     }
@@ -90,11 +212,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String origin = etOrigin.getText().toString();
         String destination = etDestination.getText().toString();
         if (origin.isEmpty()) {
-            Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ingresa origen!", Toast.LENGTH_SHORT).show();
             return;
         }
         if (destination.isEmpty()) {
-            Toast.makeText(this, "Please enter destination address!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ingresa destino!", Toast.LENGTH_SHORT).show();
             return;
         }
 

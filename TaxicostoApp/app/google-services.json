@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "22699193699",
+    "firebase_url": "https://taxicosto.firebaseio.com",
+    "project_id": "taxicosto",
+    "storage_bucket": "taxicosto.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:22699193699:android:ffc51cf6be9fd277",
+        "android_client_info": {
+          "package_name": "com.example.pipe.taxicostoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "22699193699-1saapt7ndkbfdngfhn5g24mcu319idoo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pipe.taxicostoapp",
+            "certificate_hash": "b86db7a4bae0e45c6a6481255e765544cbf5daac"
+          }
+        },
+        {
+          "client_id": "22699193699-j1otql7bm9m4sno1m5pijtcl3p2229s3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeiqHBAoBAWQnarwEeqNBBToOpyeyi6Mw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "22699193699-j1otql7bm9m4sno1m5pijtcl3p2229s3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,6 +3,12 @@
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_login">Sign in</string>
 
+    <string name="not_log_in">No se pudo iniciar sesión</string>
+    <string name="log_out">Log Out</string>
+    <string name="revoke">Revoke</string>
+    <string name="not_close_session">No se pudo cerrar sesión</string>
+    <string name="not_revoke">No se pudo revocar el acceso</string>
+
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="facebook_app_id">137371966821628</string>
